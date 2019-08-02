@@ -16,6 +16,7 @@ startTime = time.time()
 cpm = 0
 calls = 0
 entries = 0
+SA = [-90,90,-180,180] #StudyArea- minLat,maxLat,minLon,maxLon
 #lonL = -80
 #latB = 35
 #lonR = -75
@@ -38,8 +39,8 @@ def get_data(lonL,latB,lonR,latT):
     response = requests.get(url) 
     data = response.json()
     calls += 1
-    cpm = calls/(startTime/60)
-    print ("Data calls: ", calls, "CPM: ",cpm)
+    cpm = calls/((time.time()-startTime)/60)
+    print ("Data calls: ", calls, "| CPM: ",cpm)
    
 def create_table():
     c.execute("""CREATE TABLE IF NOT EXISTS weather 
@@ -59,7 +60,7 @@ def transaction_bldr(sql):
     global sql_transaction
     sql_transaction.append(sql)
     if len(sql_transaction) >= 100:
-        print (entries)
+        print ("Sending ",entries, " entries to DB")
         c.execute('BEGIN TRANSACTION')
         for s in sql_transaction:
             try:
@@ -111,10 +112,10 @@ draw_map(m)
 
 x = -180
 y = -90
-for y in range(-90,90,5):
-    for x in range(-180,180,5):
+for y in range(SA[0],SA[1],5):
+    for x in range(SA[2],SA[3],5):
         get_data(x,y,x+5,y+5)
-        
+        #print (data)
         if data:
             count = data["cnt"]
             for i in range(count):
@@ -130,5 +131,5 @@ for y in range(-90,90,5):
                 #plt.text(lon, lat, loc, fontsize=12);
                 sql_insert_data(loc, lat, lon, temp, pressure, humidity, w_ID, time.time())
         
-
+print("Time Elapsed: ", time.time()-startTime)
 conn.close()
