@@ -17,7 +17,7 @@ startTime = time.time()
 cpm = 0
 calls = 0
 entries = 0
-SA = [20,60,-90,-65] #StudyArea- minLat,maxLat,minLon,maxLon
+SA = [-90,90,-180,180] #StudyArea- minLat,maxLat,minLon,maxLon
 #lonL = -80
 #latB = 35
 #lonR = -75
@@ -26,7 +26,7 @@ zoom = 10
 #http://api.openweathermap.org/data/2.5/box/city?bbox=90,70,50,30,10&appid=09526e5c10271a3d65e467120606b982
 #url = "http://api.openweathermap.org/data/2.5/box/city?bbox={0},{1},{2},{3},{4}&appid={5}".format(lonL,latB, lonR, latT, zoom, appid)
 #sqlite3 database connection
-conn = sqlite3.connect('EastCoast.db')
+conn = sqlite3.connect('WorldWeather.db')
 c = conn.cursor()
 sql_transaction = []
 
@@ -131,16 +131,16 @@ while (True):
                     pressure = data["list"][i]["main"]["pressure"]   #pressure
                     humidity = data["list"][i]["main"]["humidity"]   #humidity
                     w_ID = data["list"][i]["weather"][0]["id"]   #Weather id
+                    if (pressure > 900 and pressure < 1030): #remove errors
+                        plt.plot(lon, lat, 'ok', markersize=1,c='red')
                     
-                    plt.plot(lon, lat, 'ok', markersize=1,c='red')
-                    
-                    #plt.text(lon, lat, loc, fontsize=12);
-                    sql_insert_data(loc, lat, lon, temp, pressure, humidity, w_ID, time.time())
+                        #plt.text(lon, lat, loc, fontsize=12);
+                        sql_insert_data(loc, lat, lon, temp, pressure, humidity, w_ID, time.time())
             
     print("Time Elapsed: ", time.time()-startTime)
     #plt.savefig('/images/EastCoast_{0}.png'.format(startTime))
     print("Creating map")
     DD.GenMap(startTime,time.time())
-    print("Waiting 10 minutes...")
-    time.sleep(600) #sleep 10 min
+    #print("Waiting 10 minutes...")
+    #time.sleep(600) #sleep 10 min
 conn.close()

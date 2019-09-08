@@ -9,12 +9,14 @@ from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
 from itertools import chain
 from datetime import datetime
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-SA = [20,60,-90,-65] #StudyArea- minLat,maxLat,minLon,maxLon
 
-TimeRange = [1565751859.9466648,1565751900]
+SA = [-90,90,-180,180] #StudyArea- minLat,maxLat,minLon,maxLon
 
-cm = plt.cm.get_cmap('bwr')
+TimeRange = [1566052220.1170807,1566055327.5714192]
+
+cm = plt.cm.get_cmap('seismic')
 
 plt.figure()
 
@@ -22,8 +24,9 @@ lat = []
 lon = []
 data = []
 
+
 def GetData():
-    conn = sqlite3.connect('EastCoast.db')
+    conn = sqlite3.connect('WorldWeather.db')
     c = conn.cursor()
     
     c.execute("SELECT * FROM weather WHERE fetchTime >= ? AND fetchTime <= ?;", (TimeRange[0],TimeRange[1]))
@@ -54,7 +57,7 @@ def GenMap(t1,t2):
     TimeRange[1] = t2
     GetData()
     
-    fig = plt.figure(figsize=(20, 20), edgecolor='w')
+    fig = plt.figure(figsize=(30, 30), edgecolor='w')
     m = Basemap(projection='cyl', resolution=None,
                     llcrnrlat=SA[0], urcrnrlat=SA[1],
                     llcrnrlon=SA[2], urcrnrlon=SA[3], )
@@ -62,8 +65,14 @@ def GenMap(t1,t2):
     
         
         #print(data)
-    sc = plt.scatter(lon, lat, c=data, cmap=cm, s=50,alpha=1)
-    plt.colorbar(sc)
-    plt.suptitle('US East Coast Atmospheric Pressure - {0}'.format(datetime.fromtimestamp(TimeRange[0])), fontsize=20)
+    
+    sc = plt.scatter(lon, lat, c=data, cmap=cm, s=5,alpha=1)
+    ax = plt.gca()
+    
+    plt.colorbar(sc,fraction=.02)
+    plt.suptitle('World Atmospheric Pressure (millibars) - {0}'.format(datetime.fromtimestamp(TimeRange[0])), fontsize=20)
     draw_map(m)
-    plt.savefig('images/EastCoast_{0}-{1}.png'.format(TimeRange[0],TimeRange[1]))
+    plt.savefig('images/World_{0}-{1}.png'.format(TimeRange[0],TimeRange[1]))
+    print("Done Creating Map: {0}".format(time.time()))
+    
+GenMap(TimeRange[0],TimeRange[1])
