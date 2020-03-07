@@ -1,5 +1,5 @@
-# WeatherAI
-AI Weather Research Project written in Python and Unity
+# 3D Weather Visualization & Prediction
+Weather Visulization Research Project written in Python and Unity
 
 Background: I original created this project to experiment with predicting weather using python. After writing a python script to download and display data on a 2d map (using matplotlib), I decided expand on the current project in COSC482 (Computer Graphics). Dan Weitman and I are working on display weather data in 3D using unity
 
